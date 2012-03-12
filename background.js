@@ -1,3 +1,6 @@
+// Copyright (c) 2012 Stuart Glaser
+// Distractome may be freely distributed under the MIT license
+
 // Issues that kill us:
 //   32699 - Reloading extensions is broken
 //   116379 - onUpdate not fired when loading page from cache
