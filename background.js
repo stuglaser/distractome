@@ -12,14 +12,35 @@ for (var i = 0; i < blocked_expressions.length; ++i) {
     blocked_list[i] = new RegExp(blocked_expressions[i]);
 }
 
+// Returns true if the url is a distraction.
+function urlIsDistraction(url)
+{
+    // Checks if the url should be blocked
+    for (var i = 0; i < blocked_list.length; ++i) {
+	if (blocked_list[i].test(url)) {
+	    return true;
+	}
+    }
+    return false;
+}
+
 // ====================  Distraction tracking
 
+// Tracks when the browser/extension was loaded, Necessary for
+// tracking the first distraction.
 var sessionStarted = new Date().getTime();
+
+// Tracks the time at which the current distraction started.
 var distractionStarted = 0;
+
+// Tracks the last time that the current distraction was verified.
 var distractionVerified = 0;
+
+// Tracks when the previous distraction ended (was last verified) so
+// we can compute how long the user was undistracted.
 var lastDistractionEnded = sessionStarted;
 
-// Calls this function when a distraction event occurs.  A distraction
+// Call this function when a distraction event occurs.  A distraction
 // will be started, or the existing distraction continued.
 function onDistracted()
 {
@@ -34,11 +55,13 @@ function onDistracted()
     distractionVerified = now;
 }
 
+// Call this function to verify that a distraction is still occuring.
 function stillDistracted()
 {
     distractionVerified = new Date().getTime();
 }
 
+// Left-pads string s with zeros so the result has length num.
 function zeroPad(s, num)
 {
     s = "" + s;
@@ -47,6 +70,7 @@ function zeroPad(s, num)
     return "00000000".slice(0, num - s.length) + s;
 }
 
+// Converts time/duration t into H:MM:SS
 function prettyTimeShort(t)
 {
     s = "";
@@ -63,6 +87,7 @@ function prettyTimeShort(t)
 	return "" + minutes + ":" + zeroPad(seconds, 2);
 }
 
+// Returns a string that informs the user how distracted he is.
 function prettyDistractedFor()
 {
     var now = new Date().getTime();
@@ -77,26 +102,10 @@ function prettyDistractedFor()
 	undistractedClause;
 }
 
-// Returns true if the url is a distraction.
-function urlIsDistraction(url)
-{
-    // Checks if the url should be blocked
-    for (var i = 0; i < blocked_list.length; ++i) {
-	if (blocked_list[i].test(url)) {
-	    return true;
-	}
-    }
-    return false;
-}
-
 
 // ====================  Listening to browser actions
 
-chrome.webNavigation.onCompleted.addListener(function (details) {
-    console.log("Completed (" + details.url + ") in [" + details.frameId + ", " + details.tabId + "]");
-    //console.log(details);
-});
-
+// Checks if a particular tab contains distracting material.
 function checkOnTab(tabId)
 {
     chrome.tabs.get(tabId, function(tab) {
@@ -113,6 +122,9 @@ function checkOnTab(tabId)
     });
 }
 
+// Registers listeners to track what pages the user visits.  Note:
+// onUpdated is broken in chrome (#116379) so we listen to
+// onActiveChanged as well.
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     //console.log("tab.onUpdated: " + tabId);
     checkOnTab(tabId);

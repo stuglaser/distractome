@@ -7,7 +7,6 @@ function updateReadout()
     bgpage.stillDistracted();
     readout.html(bgpage.prettyDistractedFor());
 }
-
 updateReadout();
 setInterval(updateReadout, 1000);
 
