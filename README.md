@@ -6,6 +6,8 @@ Set your list of websites that are distractions, and Distractome will
 track how long you've been distracted and how short you've been
 productive.
 
+<img src="http://cloud.github.com/downloads/stuglaser/distractome/screenshot_infobar.png" />
+
 Distractome uses experimental chrome features ([infobars](http://code.google.com/chrome/extensions/experimental.infobars.html)), so chrome must be run with the following flag:
 
     google-chrome --enable-experimental-extension-apis
