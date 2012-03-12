@@ -16,14 +16,23 @@ for (var i = 0; i < blocked_expressions.length; ++i) {
 
 var distractionStarted = new Date().getTime();
 var distractionVerified = new Date().getTime();
-var distractionEnded = new Date().getTime();
+var lastDistractionEnded = new Date().getTime();
 
+// Calls this function when a distraction event occurs.  A distraction
+// will be started, or the existing distraction continued.
 function onDistracted()
 {
-    distractionEnded = null;
-    distractionStarted = new Date().getTime();
-    distractionVerified = distractionStarted;
-    console.log("Distraction started");
+    var now = new Date().getTime();
+    if (now - distractionVerified > (60*1000)) {
+	console.log("Distraction started");
+	lastDistractionEnded = distractionVerified;
+	distractionStarted = now;
+    }
+    else {
+	console.log("Distraction continued");
+    }
+
+    distractionVerified = now;
 }
 
 function stillDistracted()
