@@ -43,11 +43,11 @@ function prettyTime(t)
 {
     s = "";
     t /= 1000;
-    var seconds = t % 60;
+    var seconds = Math.floor(t) % 60;
     t /= 60;
-    var minutes = t % 60;
+    var minutes = Math.floor(t) % 60;
     t /= 60;
-    var hours = t;
+    var hours = Math.floor(t);
 
     if (hours > 0)
 	return "" + hours + ":" + zeroPad(minutes, 2) + ":" + zeroPad(seconds);
