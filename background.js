@@ -61,42 +61,47 @@ function prettyDistractedFor()
     return "Distracted for " + prettyTime(now - distractionStarted);
 }
 
+// Returns true if the url is a distraction.
+function urlIsDistraction(url)
+{
+    // Checks if the url should be blocked
+    for (var i = 0; i < blocked_list.length; ++i) {
+	if (blocked_list[i].test(url)) {
+	    return true;
+	}
+    }
+    return false;
+}
+
 
 // ====================  Listening to browser actions
 
 chrome.webNavigation.onCompleted.addListener(function (details) {
-    console.log("Completed");
-    console.log(details);
+    console.log("Completed (" + details.url + ") in [" + details.frameId + ", " + details.tabId + "]");
+    //console.log(details);
 });
-chrome.webNavigation.onDOMContentLoaded.addListener(function(details) {
-    if (details.frameId == 0) {
-	console.log("Navigation in the bar.  Ignoring");
-	return;
-    }
-    if (details.transitionType != "auto_subframe") {
-	console.log("Navigated: " + details.url + " (because " + details.transitionType + ")");
-	console.log(details);
 
-	// Checks if the url should be blocked
-	var is_blocked = false;
-	for (var i = 0; i < blocked_list.length; ++i) {
-	    if (blocked_list[i].test(details.url)) {
-		is_blocked = true;
-		break;
-	    }
-	}
+function checkOnTab(tabId)
+{
+    chrome.tabs.get(tabId, function(tab) {
+	console.log("Checking tab " + tabId + " (" + tab.url + ")");
 
-	if (is_blocked) {
+	// Pops up the infobar if the url is a distraction.
+	if (urlIsDistraction(tab.url)) {
 	    onDistracted();
 	    var ib = {};
-	    ib.tabId = details.tabId;
+	    ib.tabId = tabId;
 	    ib.path = "infobar.html";
 	    chrome.experimental.infobars.show(ib);
 	}
-    }
-});
+    });
+}
 
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-    console.log("tab.onUpdated: " + tabId);
-    console.log(changeInfo);
+    //console.log("tab.onUpdated: " + tabId);
+    checkOnTab(tabId);
+});
+chrome.tabs.onActiveChanged.addListener(function(tabId, info) {
+    //console.log("tab.onActiveChanged");
+    checkOnTab(tabId);
 });
