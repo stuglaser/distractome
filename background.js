@@ -3,21 +3,31 @@
 //   116379 - onUpdate not fired when loading page from cache
 console.log("background.js loaded 9");
 
-var blocked_expressions = [
-    "reddit.com"
-];
-
-var blocked_list = [];
-for (var i = 0; i < blocked_expressions.length; ++i) {
-    blocked_list[i] = new RegExp(blocked_expressions[i]);
+// Loads the list of distractions from storage.
+//
+// returns list of regex, each matching a distracting site.
+function loadDistractionsList()
+{
+    var result = [];
+    var d = localStorage.distractions_list.split("\n");
+    for (var i = 0; i < d.length; ++i) {
+	result.push(new RegExp(d[i]));
+    }
+    return result;
 }
+
+var distractionsList = [];
+function updateDistractionsList() {
+    distractionsList = loadDistractionsList();
+}
+updateDistractionsList();
 
 // Returns true if the url is a distraction.
 function urlIsDistraction(url)
 {
     // Checks if the url should be blocked
-    for (var i = 0; i < blocked_list.length; ++i) {
-	if (blocked_list[i].test(url)) {
+    for (var i = 0; i < distractionsList.length; ++i) {
+	if (distractionsList[i].test(url)) {
 	    return true;
 	}
     }

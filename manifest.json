@@ -4,6 +4,7 @@
     "version": "0.0",
     "description": "Distractome",
     "background_page": "background.html",
+    "options_page": "options.html",
     "browser_action": {
 	"default_icon": "icon.png",
 	"popup": "popup.html"
