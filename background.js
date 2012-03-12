@@ -14,9 +14,10 @@ for (var i = 0; i < blocked_expressions.length; ++i) {
 
 // ====================  Distraction tracking
 
-var distractionStarted = new Date().getTime();
-var distractionVerified = new Date().getTime();
-var lastDistractionEnded = new Date().getTime();
+var sessionStarted = new Date().getTime();
+var distractionStarted = 0;
+var distractionVerified = 0;
+var lastDistractionEnded = sessionStarted;
 
 // Calls this function when a distraction event occurs.  A distraction
 // will be started, or the existing distraction continued.
@@ -24,12 +25,10 @@ function onDistracted()
 {
     var now = new Date().getTime();
     if (now - distractionVerified > (60*1000)) {
-	console.log("Distraction started");
-	lastDistractionEnded = distractionVerified;
+	lastDistractionEnded = Math.max(distractionVerified, sessionStarted);
 	distractionStarted = now;
     }
     else {
-	console.log("Distraction continued");
     }
 
     distractionVerified = now;
@@ -48,7 +47,7 @@ function zeroPad(s, num)
     return "00000000".slice(0, num - s.length) + s;
 }
 
-function prettyTime(t)
+function prettyTimeShort(t)
 {
     s = "";
     t /= 1000;
@@ -67,7 +66,15 @@ function prettyTime(t)
 function prettyDistractedFor()
 {
     var now = new Date().getTime();
-    return "Distracted for " + prettyTime(now - distractionStarted);
+
+    // Adds an "undistracted for" clause if we were just distracted.
+    var undistractedClause = "";
+    if (now - distractionStarted < (60*1000)) {
+	undistractedClause = " (was undistracted for " + 
+	    prettyTimeShort(distractionStarted - lastDistractionEnded) + ")";
+    }
+    return "Distracted for " + prettyTimeShort(now - distractionStarted) +
+	undistractedClause;
 }
 
 // Returns true if the url is a distraction.
