@@ -18,6 +18,11 @@
 
   <script src="jquery-1.7.1.min.js"></script>
   <script src="options.js"></script>
+  <script type="text/javascript">
+    // Saves whenever the list changes
+    $("#distractions_list").bind('input paste', saveOptions);
+    $(populateOptionsPage);
+  </script>
 </body>
 
 </html>

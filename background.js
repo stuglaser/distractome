@@ -12,7 +12,8 @@ console.log("background.js loaded 9");
 function loadDistractionsList()
 {
     var result = [];
-    var d = localStorage.distractions_list.split("\n");
+    var options = getOptions();
+    var d = options.distractionsList.split("\n");
     for (var i = 0; i < d.length; ++i) {
 	result.push(new RegExp(d[i]));
     }
